@@ -1,0 +1,33 @@
+{
+  "name": "projeto12-batepapo-uol-api",
+  "version": "1.0.0",
+  "description": "construção da API do Bate-papo UOL",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev":"nodemon src/app.js",
+    "test":"node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://Uenderss: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@github.com/Uenderss/projeto12-batepapo-uol-api.git"
+  },
+  "author": "Bartolomeu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Uenderss/projeto12-batepapo-uol-api/issues"
+  },
+  "homepage": "https://github.com/Uenderss/projeto12-batepapo-uol-api#readme",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "cors": "^2.8.5",
+    "days": "^1.1.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "joi": "^17.6.0",
+    "mongodb": "^4.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  }
+}
