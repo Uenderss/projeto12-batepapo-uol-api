@@ -10,24 +10,15 @@ app.use(json());
 dotenv.config();
 
 //banco de dados
-let db=null;
 const porta = process.env.PORTA||5000;
-const uri = process.env.URL_MONGO;
-
-const client= new MongoClient(uri);
-
-async function run(){
-  try{
-    await client.connect();
-    db=client.db(process.env.MEUBANCO);
-    console.log(chalk.green("Mongo conectado"));
-
-  }catch{
-    console.log(err);
-  }
-}
-
-run();
+let db=null;
+const urlBanco = process.env.URL_MONGO;
+const client= new MongoClient(urlBanco);
+const promise=client.connect();
+promise.then(()=>{
+  db=client.db(process.env.MEUBANCO);
+  console.log(chalk.green("Mongo conectado"));
+}).catch( e=> console.log("Falha na conexao do banco",e));
 
 app.post('/participants',async(req,res)=>{
   const participants = req.body;
