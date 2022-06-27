@@ -5,8 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.js",
-    "test": "node src/app.js"
+    "dev": "nodemon app.js",
+    "test": "node app.js",
+    "start":"node app.js"
   },
   "repository": {
     "type": "git",

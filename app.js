@@ -12,14 +12,14 @@ app.use(json());
 dotenv.config();
 
 //banco de dados
-const porta = process.env.PORTA || 5000;
-let db = null;
-const urlBanco = process.env.URL_MONGO;
+const port = process.env.PORT || 5000;
+let db;
+const urlBanco = process.env.URL_DATABASE;
 const client = new MongoClient(urlBanco);
 const promise = client.connect();
 promise
   .then(() => {
-    db = client.db(process.env.MEUBANCO);
+    db = client.db(process.env.DATABASE);
     console.log(chalk.green("Mongo conectado"));
   })
   .catch((e) => console.log("Falha na conexao do banco", e));
@@ -52,7 +52,7 @@ app.post("/participants", async (req, res) => {
         res.sendStatus(201);
     }
   } catch (e) {
-    return console.log("Algo de errado não esta certo");
+    return console.log("Algo de errado não esta certo",e);
   }
 });
 
@@ -60,7 +60,7 @@ app.get("/participants", async (req, res) => {
   try {
     res.send( await db.collection("participants").find().toArray());
   } catch (e) {
-    return res.status(500).send("erro", e);
+    return res.sendStatus(500);
   }
 });
 
@@ -74,8 +74,9 @@ app.post("/messages", async(req,res)=>{
     text:joi.string().required(),
     type:joi.string().valid('message').valid('private_message').valid("status").required()
   })
-  if(messageSchema.validate(message).error){
-    return res.status(422).send(messageSchema.validate(message).error.details[0].message);
+  const {error}=messageSchema.validate(message);
+  if(error){
+    return res.status(422).send(error.details[0].message);
   }
   try{
    await db.collection("messages").insertOne({
@@ -97,10 +98,10 @@ app.get("/messages", async (req, res) => {
   const {user} = req.headers;
  
   try {
-    res.send( await db.collection("messages").find({$or:[{to:"Todos"},{to:user},{from:user},{type:'message'}]}).limit(limit).sort(-1).toArray());
+    res.send( await db.collection("messages").find({$or:[{to:"Todos"},{to:user},{from:user},{type:'message'}]}).limit(limit).toArray());
     
   } catch (e) {
-    return res.status(500).send("erro", e);
+    return res.sendStatus(500);
   }
 });
 
@@ -124,6 +125,7 @@ setInterval(async () => {
   
   const tempo = Date.now() - (10 * 1000);
   try {
+    
     const removerParticipantes = await db.collection("participants").find({ lastStatus: { $lte: tempo } }).toArray();
     if (removerParticipantes.length > 0) {
       const messageInative = removerParticipantes.map(removerParticipante => {
@@ -140,12 +142,12 @@ setInterval(async () => {
       await db.collection("participants").deleteMany({ lastStatus: { $lte: tempo } });
     }
   } catch (e) {
-    console.log("Erro ao remover usuários inativos!", e);
-    res.sendStatus(500);
+    console.log("erro ao remover usuario:",e);
+ 
   }
 }, process.env.TIMEOUT);
 
 
-app.listen(porta, () => {
-  console.log(chalk.green.bold("servidor conectado a porta: " + porta));
+app.listen(port, () => {
+  console.log(chalk.green.bold("servidor conectado a port: " + port));
 });
