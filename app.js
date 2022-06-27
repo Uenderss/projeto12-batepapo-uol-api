@@ -143,7 +143,7 @@ setInterval(async () => {
     console.log("Erro ao remover usuários inativos!", e);
     res.sendStatus(500);
   }
-}, TIMEOUT);
+}, process.env.TIMEOUT);
 
 
 app.listen(porta, () => {
