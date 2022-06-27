@@ -121,8 +121,8 @@ app.post("/status",async(req,res)=>{
 
 
 setInterval(async () => {
-  console.log("removendo a galera");
-  const seconds = Date.now() - (10 * 1000); // 10s
+  
+  const seconds = Date.now() - (10 * 1000);
   try {
     const removerParticipantes = await db.collection("participants").find({ lastStatus: { $lte: seconds } }).toArray();
     if (removerParticipantes.length > 0) {
