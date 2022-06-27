@@ -64,12 +64,40 @@ app.get("/participants", async (req, res) => {
   }
 });
 
+app.post("/messages", async(req,res)=>{
+  const {user}= req.headers;
+  const message=req.body;
+  const {to,text,type}=message;
+  
+  const messageSchema=joi.object({
+    to:joi.string().min(1).required(),
+    text:joi.string().required(),
+    type:joi.string().valid('message').valid('private_message').valid("status").required()
+  })
+  if(messageSchema.validate(message).error){
+    return res.status(422).send(messageSchema.validate(message).error.details[0].message);
+  }
+  try{
+   await db.collection("messages").insertOne({
+    to,
+    text,
+    type,
+    from:user,
+    time:dayjs().format('HH:mm:ss')
+   });
+   res.sendStatus(201);
+  }catch{
+    return res.status(422).send("Usuario não cadastrado");
+  }
+  
+});
+
 app.get("/messages", async (req, res) => {
   let limit=parseInt(req.body.limit);
   const {user} = req.headers;
-
+ 
   try {
-    res.send( await db.collection("messages").find({$or: [{from:{$ne: user}},{to:{$ne:user}},{type:{$ne:"private_message"}}]}).limit(limit).toArray());
+    res.send( await db.collection("messages").find({$or:[{to:"Todos"},{to:user},{from:user},{type:'message'}]}).limit(limit).sort(-1).toArray());
     
   } catch (e) {
     return res.status(500).send("erro", e);
