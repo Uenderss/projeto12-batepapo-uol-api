@@ -63,13 +63,19 @@ app.get("/participants", async (req, res) => {
     return res.status(500).send("erro", e);
   }
 });
+
 app.get("/messages", async (req, res) => {
+  let limit=parseInt(req.body.limit);
+  const {user} = req.headers;
+
   try {
-    res.send( await db.collection("messages").find().toArray());
+    res.send( await db.collection("messages").find({$or: [{from:{$ne: user}},{to:{$ne:user}},{type:{$ne:"private_message"}}]}).limit(limit).toArray());
+    
   } catch (e) {
     return res.status(500).send("erro", e);
   }
 });
+
 app.listen(porta, () => {
   console.log(chalk.green.bold("servidor conectado a porta: " + porta));
 });
