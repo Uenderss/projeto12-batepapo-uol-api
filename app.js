@@ -119,13 +119,13 @@ app.post("/status",async(req,res)=>{
   }
 });
 
-//remover usuarios parados a 15 segundos.
+
 setInterval(async(req,res)=>{ 
   const valor = Date.now() - (10 * 1000); 
 
   try {
       await db.collection("participants").findOne({ lastStatus:{$lt: valor }}) && await db.collection("messages").insertOne({
-        from: req.headers.user,
+        from: ,
         to: "Todos",
         text: "sai da sala...",
         type: "status",
@@ -134,7 +134,7 @@ setInterval(async(req,res)=>{
       await db.collection("participants").deleteMany({  lastStatus:{$lt: valor }});
       res.sendStatus(201);
   } catch (e) {
-    return res.sendStatus(500);
+   res.sendStatus(500);
   }
 },process.env.TIMEOUT);
 
