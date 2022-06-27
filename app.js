@@ -120,23 +120,31 @@ app.post("/status",async(req,res)=>{
 });
 
 
-setInterval(async(req,res)=>{ 
-  const valor = Date.now() - (10 * 1000); 
-
+setInterval(async () => {
+  console.log("removendo a galera");
+  const seconds = Date.now() - (10 * 1000); // 10s
   try {
-      await db.collection("participants").findOne({ lastStatus:{$lt: valor }}) && await db.collection("messages").insertOne({
-        from: ,
-        to: "Todos",
-        text: "sai da sala...",
-        type: "status",
-        time: dayjs().format("HH:mm:ss"),
+    const removerParticipantes = await db.collection("participants").find({ lastStatus: { $lte: seconds } }).toArray();
+    if (removerParticipantes.length > 0) {
+      const inativeMessages = removerParticipantes.map(removerParticipante => {
+        return {
+          from: removerParticipante.name,
+          to: 'Todos',
+          text: 'sai da sala...',
+          type: 'status',
+          time: dayjs().format("HH:mm:ss")
+        }
       });
-      await db.collection("participants").deleteMany({  lastStatus:{$lt: valor }});
-      res.sendStatus(201);
+
+      await db.collection("messages").insertMany(inativeMessages);
+      await db.collection("participants").deleteMany({ lastStatus: { $lte: seconds } });
+    }
   } catch (e) {
-   res.sendStatus(500);
+    console.log("Erro ao remover usuários inativos!", e);
+    res.sendStatus(500);
   }
-},process.env.TIMEOUT);
+}, TIMEOUT);
+
 
 app.listen(porta, () => {
   console.log(chalk.green.bold("servidor conectado a porta: " + porta));
