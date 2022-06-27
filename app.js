@@ -122,11 +122,11 @@ app.post("/status",async(req,res)=>{
 
 setInterval(async () => {
   
-  const seconds = Date.now() - (10 * 1000);
+  const tempo = Date.now() - (10 * 1000);
   try {
-    const removerParticipantes = await db.collection("participants").find({ lastStatus: { $lte: seconds } }).toArray();
+    const removerParticipantes = await db.collection("participants").find({ lastStatus: { $lte: tempo } }).toArray();
     if (removerParticipantes.length > 0) {
-      const inativeMessages = removerParticipantes.map(removerParticipante => {
+      const messageInative = removerParticipantes.map(removerParticipante => {
         return {
           from: removerParticipante.name,
           to: 'Todos',
@@ -136,8 +136,8 @@ setInterval(async () => {
         }
       });
 
-      await db.collection("messages").insertMany(inativeMessages);
-      await db.collection("participants").deleteMany({ lastStatus: { $lte: seconds } });
+      await db.collection("messages").insertMany(messageInative);
+      await db.collection("participants").deleteMany({ lastStatus: { $lte: tempo } });
     }
   } catch (e) {
     console.log("Erro ao remover usuários inativos!", e);
